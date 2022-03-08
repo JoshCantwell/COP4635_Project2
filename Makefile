@@ -1,13 +1,17 @@
 Server:= Server.o
 Client:= Client.o
 
-all: Server Client
+CC = g++
 
-a: $(Server)
-	g++ -o$@ $^
+CFLAGS = -std=c++11 -g -Wall
+
+all: Server Client User.o
+
+a: $(Server) User.o
+	$(CC) $(CFLAGS) -o$@ $^
 
 b: $(Client)
-	g++ -o$@ $^
+	$(CC) $(CFLAGS) -o$@ $^
 
 %.o: %.c
 	g++ -c -o$@ $<
