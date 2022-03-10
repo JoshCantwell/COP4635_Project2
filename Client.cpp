@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <iostream>
 
 #define PORT 8080
 
@@ -16,7 +17,8 @@ int main(int argc, char const *argv[])
 {
     int sock = 0; long valread;
     struct sockaddr_in serv_addr;
-    char *hello = "Hello from client";
+    char* hello;// = "Hello from client";
+    std::string message;
     char buffer[1024] = {0};
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
@@ -35,12 +37,17 @@ int main(int argc, char const *argv[])
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
-    
+
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
         printf("\nConnection Failed \n");
         return -1;
     }
+
+    std::getline(std::cin, message);
+
+    hello = const_cast<char*>(message.c_str());
+
     send(sock , hello , strlen(hello) , 0 );
     printf("Hello message sent\n");
     valread = read( sock , buffer, 1024);

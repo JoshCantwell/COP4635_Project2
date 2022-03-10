@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <pthread.h>
+#include <iostream>
 
 #define PORT 8080
 
@@ -20,6 +21,10 @@ int main(int argc, char const *argv[])
     int server_fd, new_socket; long valread;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
+ 
+    pthread_t t;
+    
+    void *ret;
     
     
     // Creating socket file descriptor
@@ -56,13 +61,24 @@ int main(int argc, char const *argv[])
             exit(EXIT_FAILURE);
         }
 
+        std::cout << new_socket << std::endl;
 //        Handle_Connection(new_socket);
-        pthread_t t;
-        int *pclient = (int*)malloc(sizeof(int));
+       int *pclient = (int*)malloc(sizeof(int));
         *pclient = new_socket;
-        pthread_create(&t, NULL, Handle_Connection, pclient);
+        if(pthread_create(&t, NULL, Handle_Connection, pclient) != 0) {
+            perror("pthread_create() error");
+            exit(1);
+        }
+
 
     }
+
+
+    if(pthread_join(t, &ret) != 0) {
+        perror("pthread_create() error");
+        exit(3);    
+    }
+
     return 0;
 }
 
