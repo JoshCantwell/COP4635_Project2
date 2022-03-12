@@ -44,13 +44,19 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
+    valread = read( sock , buffer, 1024);
+    printf("%s\n",buffer );
+
+
+
     std::getline(std::cin, message);
 
     hello = const_cast<char*>(message.c_str());
 
     send(sock , hello , strlen(hello) , 0 );
     printf("Hello message sent\n");
-    valread = read( sock , buffer, 1024);
-    printf("%s\n",buffer );
+ 
+   
+    
     return 0;
 }

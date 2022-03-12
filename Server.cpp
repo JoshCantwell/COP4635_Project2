@@ -14,18 +14,24 @@
 
 #define PORT 8080
 
+
+// Functions used throughout the code
 void * Handle_Connection(void * new_socket);
+void UserLogin();
+void UserRegister();
+
+
 
 int main(int argc, char const *argv[])
 {
+    // Variables for TCP socket creation
     int server_fd, new_socket; long valread;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
  
-    pthread_t t;
-    
+    // Variables for multithreading
+    pthread_t t;    
     void *ret;
-    
     
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
@@ -52,6 +58,7 @@ int main(int argc, char const *argv[])
         perror("In listen");
         exit(EXIT_FAILURE);
     }
+    
     while(1)
     {
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
@@ -61,25 +68,22 @@ int main(int argc, char const *argv[])
             exit(EXIT_FAILURE);
         }
 
-        std::cout << new_socket << std::endl;
-//        Handle_Connection(new_socket);
        int *pclient = (int*)malloc(sizeof(int));
-        *pclient = new_socket;
-        if(pthread_create(&t, NULL, Handle_Connection, pclient) != 0) {
-            perror("pthread_create() error");
-            exit(1);
-        }
-
+       *pclient = new_socket;
+       
+       if(pthread_create(&t, NULL, Handle_Connection, pclient) != 0) {
+           perror("pthread_create() error");
+           exit(1);
+       }
 
     }
 
+       if(pthread_join(t, &ret) != 0) {
+           perror("pthread_create() error");
+           exit(3);    
+       }
 
-    if(pthread_join(t, &ret) != 0) {
-        perror("pthread_create() error");
-        exit(3);    
-    }
-
-    return 0;
+       return 0;
 }
 
 
@@ -89,11 +93,15 @@ void * Handle_Connection(void * p_new_socket) {
     int new_socket = *((int*)p_new_socket);
     free(p_new_socket);
     long valread;
-    char *hello = "Hello from server";
-    char buffer[30000] = {0};
+    char *LoginRegisterPrompt = "Welcome!\n  Press 1 to login\n  Press 2 to register\n  Type 'exit' to Quit\n\n";
+    char buffer[30000] = {0}; 
+   
+    
+    write(new_socket , LoginRegisterPrompt , strlen(LoginRegisterPrompt));
+    
     valread = read( new_socket , buffer, 30000);
+    
     printf("%s\n",buffer );
-    write(new_socket , hello , strlen(hello));
     printf("------------------Hello message sent-------------------\n");
     close(new_socket);
 
@@ -101,3 +109,27 @@ void * Handle_Connection(void * p_new_socket) {
 
 
 }
+
+void UserLogin() {
+
+
+}
+
+void UserRegister(){
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
