@@ -12,6 +12,7 @@
 #include <pthread.h>
 #include <iostream>
 
+
 #define PORT 8080
 
 
@@ -92,25 +93,57 @@ void * Handle_Connection(void * p_new_socket) {
 
     User *user = new User();    
 
-
     int new_socket = *((int*)p_new_socket);
-    
-
-    user->setSocketNumber(new_socket);
-
     free(p_new_socket);
     long valread;
     char *LoginRegisterPrompt = "Welcome!\n  Press 1 to login\n  Press 2 to register\n  Type 'exit' to Quit\n\n";
+    char *UserSelectionPrompt = "  Select an option\n  1 Subscribe to a location\n  2 Unsubscribe from a location\n  3 Send message to a location\n  4 Send a private message\n  5 See all the locations you are subscribed to\n  6 See all online users\n  7 See last 10 messages\n 8 Change password\n  Type 'exit' to quit";
     char buffer[30000] = {0}; 
 
+    bool loggedIn = false;
+    user->setSocketNumber(new_socket);
     std::string stringBuffer;
+    std::string username, password;
+
 
     while(stringBuffer != "exit") {
-    write(new_socket , LoginRegisterPrompt , strlen(LoginRegisterPrompt));
-    
-    valread = read( new_socket , buffer, 30000);
 
-    stringBuffer = buffer;
+
+        if(loggedIn == false) {
+        
+
+            write(new_socket , LoginRegisterPrompt , strlen(LoginRegisterPrompt));
+            valread = read( new_socket , buffer, 30000);
+            stringBuffer = buffer;
+       
+       
+            if(stringBuffer == "1"){
+                write(new_socket, "  Username:", 12);
+                valread = read(new_socket, buffer, 30000);
+                username = buffer;
+                write(new_socket, "  Password:", 13);
+                valread = read(new_socket, buffer, 30000);
+                password = buffer;
+
+                if(user->findUser(username, password) == true){
+                 
+                    loggedIn = true;
+                } else {
+        
+                    write(new_socket, "\n  Invalid username or password\n", 32);
+                }
+
+            } else if(stringBuffer == "2") {
+                
+                // put register code here
+
+            }
+
+        }
+
+
+
+
     }
 
     //printf("%s\n",buffer );

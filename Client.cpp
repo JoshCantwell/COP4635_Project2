@@ -19,7 +19,7 @@ int main(int argc, char const *argv[])
     struct sockaddr_in serv_addr;
     char* hello;// = "Hello from client";
     std::string message;
-    char buffer[1024] = {0};
+    
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         printf("\n Socket creation error \n");
@@ -45,18 +45,18 @@ int main(int argc, char const *argv[])
     }
 
     while(message != "exit") {
-    valread = read( sock , buffer, 1024);
-    printf("%s\n",buffer );
+   
+        message = "";
+        
+    
+        char buffer[1024] = {0};
+        valread = read( sock , buffer, 1024);
+        printf("%s  ",buffer );
+        std::getline(std::cin, message);
+        hello = const_cast<char*>(message.c_str());
+        send(sock , hello , strlen(hello) , 0 );
 
-
-
-    std::getline(std::cin, message);
-
-    hello = const_cast<char*>(message.c_str());
-
-    send(sock , hello , strlen(hello) , 0 );
-    printf("Hello message sent\n");
- 
+   
     }
     
     return 0;

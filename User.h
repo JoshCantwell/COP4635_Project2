@@ -3,12 +3,14 @@
 
 #include <iostream>
 #include <vector>
+#include <fstream> 
 
 class User {
 
     public:
 
-
+        
+        bool findUser(std::string userName, std::string password);
         std::string getUsername();
         std::string getLocations();
         std::string getMessagesRecieved();
