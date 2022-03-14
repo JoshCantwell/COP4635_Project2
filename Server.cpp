@@ -97,25 +97,30 @@ void * Handle_Connection(void * p_new_socket) {
     free(p_new_socket);
     long valread;
     char *LoginRegisterPrompt = "Welcome!\n  Press 1 to login\n  Press 2 to register\n  Type 'exit' to Quit\n\n";
-    char *UserSelectionPrompt = "  Select an option\n  1 Subscribe to a location\n  2 Unsubscribe from a location\n  3 Send message to a location\n  4 Send a private message\n  5 See all the locations you are subscribed to\n  6 See all online users\n  7 See last 10 messages\n 8 Change password\n  Type 'exit' to quit";
-    char buffer[30000] = {0}; 
+    char *UserSelectionPrompt = "\n  Select an option\n  1 Subscribe to a location\n  2 Unsubscribe from a location\n  3 Send message to a location\n  4 Send a private message\n  5 See all the locations you are subscribed to\n  6 See all online users\n  7 See last 10 messages\n  8 Change password\n  Type 'exit' to quit\n";
 
     bool loggedIn = false;
     user->setSocketNumber(new_socket);
     std::string stringBuffer;
     std::string username, password;
+    std::string location;
 
+    std::string locations;
 
     while(stringBuffer != "exit") {
 
+    
+        char buffer[30000] = {0}; 
 
         if(loggedIn == false) {
         
+        
+            stringBuffer = "";
 
             write(new_socket , LoginRegisterPrompt , strlen(LoginRegisterPrompt));
             valread = read( new_socket , buffer, 30000);
             stringBuffer = buffer;
-       
+
        
             if(stringBuffer == "1"){
                 write(new_socket, "  Username:", 12);
@@ -125,8 +130,9 @@ void * Handle_Connection(void * p_new_socket) {
                 valread = read(new_socket, buffer, 30000);
                 password = buffer;
 
-                if(user->findUser(username, password) == true){
-                 
+
+                if(user->findUser(username, password) == true){                
+                    user->setUserName(username);
                     loggedIn = true;
                 } else {
         
@@ -134,14 +140,67 @@ void * Handle_Connection(void * p_new_socket) {
                 }
 
             } else if(stringBuffer == "2") {
-                
-                // put register code here
+                write(new_socket, "  Username:", 12);
+                valread = read(new_socket, buffer, 30000);
+                username = buffer;
+                write(new_socket, "  Password:", 13);
+                valread = read(new_socket, buffer, 30000);
+                password = buffer;
 
+                
+                if(user->checkUserName(username) == true) {
+
+                    write(new_socket, "\nUsername already taken!\n", 24);
+            
+                } else {
+
+                    user->registerUser(username, password);
+                    write(new_socket, "\nUser registered!\n", 18);
+                }
+            
+        
+            }
+        }else if (loggedIn == true) {
+
+            write(new_socket , UserSelectionPrompt , strlen(UserSelectionPrompt));
+            valread = read( new_socket , buffer, 30000);
+            stringBuffer = buffer;
+
+            if(stringBuffer == "1") {
+
+                write(new_socket, "  Select a location to subscribe to:\n", 37);
+                valread = read(new_socket, buffer, 30000);
+                location = buffer;
+                user->subscribeToLocation(location);
+
+            } else if(stringBuffer == "2") {
+
+                write(new_socket, "  Select a location to unsubscribe from:\n", 43);
+                valread = read(new_socket, buffer, 30000);
+                location = buffer;
+                user->unsubscribeToLocation(location);
+                
+            } else if(stringBuffer == "5") {
+
+                
+                std::string subbedLocations  = user->subscribedLocations();
+                char* subbedLocationsChar = const_cast<char*>(subbedLocations.c_str());
+                write(new_socket, subbedLocationsChar, strlen(subbedLocationsChar));
+
+            } else if(stringBuffer == "8") {
+
+                username = user->getUsername();
+                write(new_socket, "\n  Select new password:\n", 23);
+                valread = read(new_socket, buffer, 30000);
+                password = buffer;
+                user->changePassword(username, password);
+
+                rename("temp.txt", "Users.txt");
+
+    
             }
 
         }
-
-
 
 
     }

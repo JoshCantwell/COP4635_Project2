@@ -1,6 +1,104 @@
 #include "User.h"
 
-bool User::findUser(std::string Username, std::string password){
+void User::changePassword(std::string username, std::string password) {
+
+                
+    std::ifstream userFileOut;
+    std::ofstream userFileIn;
+    std::string user;
+    std::string pass;
+
+    userFileOut.open("Users.txt");
+    userFileIn.open("temp.txt");
+
+
+    if(!userFileOut){
+        
+        std::cerr;
+        exit(1);
+    }
+    if(!userFileIn){
+
+        std::cerr;
+        exit(1);
+    }
+
+    while(!userFileOut.eof()) {
+        
+        userFileOut >> user;    
+        userFileOut >> pass;
+
+        if(user != username){
+                
+            if(userFileOut.eof()) break;
+            userFileIn << user << " " << pass << std::endl;
+        
+        }  
+        
+    }
+
+    userFileIn << username << " " << password << std::endl;
+
+    userFileOut.close();
+    userFileIn.close();
+
+
+
+}
+
+std::string User::subscribedLocations() {
+
+    std::string location;
+    location.append("\n  Locations subscribed to:\n");
+
+    for(int i = 0; i < locations.size(); i++) {
+        
+        location.append(locations.at(i));
+
+        location.append("\n");
+    }
+
+    return location;
+}
+
+void User::subscribeToLocation(std::string location) {
+
+    locations.push_back(location);
+    
+
+}
+
+void User::unsubscribeToLocation(std::string location) {
+
+    for(int i = 0; i < locations.size(); i++) {
+
+        if(locations.at(i) == location) {
+
+            locations.erase(locations.begin() + i);
+
+        }
+
+    }
+
+}
+
+void User::registerUser(std::string username, std::string password) {
+
+    std::ofstream userFile;
+    
+    userFile.open("Users.txt", std::ios_base::app);
+
+    if(!userFile){
+
+        std::cerr;
+        exit(1);
+    }
+
+    userFile << username << " "<< password << std::endl;;
+
+}
+
+bool User::checkUserName(std::string username) {
 
     std::ifstream userFile;
     std::string user;
@@ -20,6 +118,42 @@ bool User::findUser(std::string Username, std::string password){
               
         userFile >> pass;
 
+        if(user == username){
+                
+            return true;
+
+        }
+    
+    }
+
+    userFile.close();
+
+    return false;
+
+
+}
+
+bool User::findUser(std::string Username, std::string password){
+
+    std::ifstream userFile;
+    std::string user;
+    std::string pass;
+
+    userFile.open("Users.txt");
+
+    if(!userFile){
+        
+        std::cerr;
+        exit(1);
+    }
+   
+
+    while(!userFile.eof()) {
+        
+        userFile >> user;
+              
+        userFile >> pass;
+
         if(user == Username && pass == password){
                 
             return true;
@@ -31,6 +165,11 @@ bool User::findUser(std::string Username, std::string password){
     userFile.close();
 
     return false;
+}
+
+void User::setUserName(std::string username) {
+
+    this->userName = username;
 }
 
 std::string User::getUsername() {

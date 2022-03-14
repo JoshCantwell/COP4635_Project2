@@ -47,15 +47,17 @@ int main(int argc, char const *argv[])
     while(message != "exit") {
    
         message = "";
-        
+        hello = "";
     
         char buffer[1024] = {0};
         valread = read( sock , buffer, 1024);
         printf("%s  ",buffer );
+       
+
+  
         std::getline(std::cin, message);
         hello = const_cast<char*>(message.c_str());
         send(sock , hello , strlen(hello) , 0 );
-
    
     }
     
