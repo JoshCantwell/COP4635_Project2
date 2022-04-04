@@ -2,6 +2,7 @@
 // COP4635 - Systems and Networks II
 // This C++ file is used for server side of communication
 
+
 #include "User.cpp"
 #include <stdio.h>
 #include <sys/socket.h>
@@ -13,7 +14,7 @@
 #include <iostream>
 
 
-#define PORT 8080
+#define PORT 60000
 
 
 // Functions used throughout the code
@@ -205,8 +206,6 @@ void * Handle_Connection(void * p_new_socket) {
 
     }
 
-    //printf("%s\n",buffer );
-    //printf("------------------Hello message sent-------------------\n");
     close(new_socket);
        
     std::cout << "Client disconnected" << std::endl;
@@ -215,17 +214,6 @@ void * Handle_Connection(void * p_new_socket) {
 
 }
 
-void UserLogin() {
-
-
-    std::cout << "login" << std::endl;
-
-}
-
-void UserRegister(){
-
-
-}
 
 
 

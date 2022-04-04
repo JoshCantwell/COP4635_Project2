@@ -1,3 +1,9 @@
+// Created by: Josh Cantwell 02-28-22
+// COP4635 - Systems and Networks II
+// This C++ file is used to aid the server for keep track of users in the program
+
+
+
 #include "User.h"
 
 void User::changePassword(std::string username, std::string password) {
@@ -13,12 +19,11 @@ void User::changePassword(std::string username, std::string password) {
 
 
     if(!userFileOut){
-        
         std::cerr;
         exit(1);
     }
-    if(!userFileIn){
 
+    if(!userFileIn){
         std::cerr;
         exit(1);
     }
@@ -29,10 +34,8 @@ void User::changePassword(std::string username, std::string password) {
         userFileOut >> pass;
 
         if(user != username){
-                
             if(userFileOut.eof()) break;
             userFileIn << user << " " << pass << std::endl;
-        
         }  
         
     }
@@ -52,9 +55,7 @@ std::string User::subscribedLocations() {
     location.append("\n  Locations subscribed to:\n");
 
     for(int i = 0; i < locations.size(); i++) {
-        
         location.append(locations.at(i));
-
         location.append("\n");
     }
 
@@ -62,22 +63,15 @@ std::string User::subscribedLocations() {
 }
 
 void User::subscribeToLocation(std::string location) {
-
     locations.push_back(location);
-    
-
 }
 
 void User::unsubscribeToLocation(std::string location) {
 
     for(int i = 0; i < locations.size(); i++) {
-
         if(locations.at(i) == location) {
-
             locations.erase(locations.begin() + i);
-
         }
-
     }
 
 }
@@ -89,7 +83,6 @@ void User::registerUser(std::string username, std::string password) {
     userFile.open("Users.txt", std::ios_base::app);
 
     if(!userFile){
-
         std::cerr;
         exit(1);
     }
@@ -107,7 +100,6 @@ bool User::checkUserName(std::string username) {
     userFile.open("Users.txt");
 
     if(!userFile){
-        
         std::cerr;
         exit(1);
     }
@@ -119,9 +111,7 @@ bool User::checkUserName(std::string username) {
         userFile >> pass;
 
         if(user == username){
-                
             return true;
-
         }
     
     }
@@ -129,7 +119,6 @@ bool User::checkUserName(std::string username) {
     userFile.close();
 
     return false;
-
 
 }
 
@@ -142,7 +131,6 @@ bool User::findUser(std::string Username, std::string password){
     userFile.open("Users.txt");
 
     if(!userFile){
-        
         std::cerr;
         exit(1);
     }
@@ -155,9 +143,7 @@ bool User::findUser(std::string Username, std::string password){
         userFile >> pass;
 
         if(user == Username && pass == password){
-                
             return true;
-
         }
     
     }

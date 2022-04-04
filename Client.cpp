@@ -11,13 +11,13 @@
 #include <arpa/inet.h>
 #include <iostream>
 
-#define PORT 8080
+#define PORT 60000
 
 int main(int argc, char const *argv[])
 {
     int sock = 0; long valread;
     struct sockaddr_in serv_addr;
-    char* hello;// = "Hello from client";
+    char* prompt;
     std::string message;
     
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -47,7 +47,7 @@ int main(int argc, char const *argv[])
     while(message != "exit") {
    
         message = "";
-        hello = "";
+        prompt = "";
     
         char buffer[1024] = {0};
         valread = read( sock , buffer, 1024);
@@ -56,8 +56,8 @@ int main(int argc, char const *argv[])
 
   
         std::getline(std::cin, message);
-        hello = const_cast<char*>(message.c_str());
-        send(sock , hello , strlen(hello) , 0 );
+        prompt = const_cast<char*>(message.c_str());
+        send(sock , prompt , strlen(prompt) , 0 );
    
     }
     
