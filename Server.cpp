@@ -12,7 +12,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <iostream>
-
+#include <vector>
 
 #define PORT 60000
 
@@ -21,8 +21,11 @@
 void * Handle_Connection(void * new_socket);
 void UserLogin();
 void UserRegister();
+void LogUserOut(std::string userName);
+std::string OnlineUsers();
 
-
+// Users logged in
+std::vector <User*> users;
 
 int main(int argc, char const *argv[])
 {
@@ -34,7 +37,8 @@ int main(int argc, char const *argv[])
     // Variables for multithreading
     pthread_t t;    
     void *ret;
-    
+
+
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
@@ -134,6 +138,7 @@ void * Handle_Connection(void * p_new_socket) {
 
                 if(user->findUser(username, password) == true){                
                     user->setUserName(username);
+                    users.push_back(user);
                     loggedIn = true;
                 } else {
         
@@ -188,7 +193,18 @@ void * Handle_Connection(void * p_new_socket) {
                 char* subbedLocationsChar = const_cast<char*>(subbedLocations.c_str());
                 write(new_socket, subbedLocationsChar, strlen(subbedLocationsChar));
 
-            } else if(stringBuffer == "8") {
+            } else if(stringBuffer == "6") {
+       
+                std::string usersOnline;
+                usersOnline = usersOnline + "  All online users:\n";
+                usersOnline = usersOnline + OnlineUsers();
+                char* usersOnlineC = const_cast<char*>(usersOnline.c_str());
+                write(new_socket, usersOnlineC, strlen(usersOnlineC));
+                valread = read(new_socket, buffer, 30000);
+
+                location = buffer;
+
+            }else if(stringBuffer == "8") {
 
                 username = user->getUsername();
                 write(new_socket, "\n  Select new password:\n", 23);
@@ -199,10 +215,19 @@ void * Handle_Connection(void * p_new_socket) {
                 rename("temp.txt", "Users.txt");
 
     
+            } // Testing
+            else if (stringBuffer == "d") {
+
+                std::cout << OnlineUsers() << std::endl; 
             }
+
 
         }
 
+        if(stringBuffer == "exit") {
+
+            LogUserOut(user->getUsername());
+        }
 
     }
 
@@ -214,8 +239,33 @@ void * Handle_Connection(void * p_new_socket) {
 
 }
 
+void LogUserOut(std::string userName){
 
+    for(int i=0; i < users.size();i++) {
 
+        if(users.at(i)->getUsername() == userName) {
+               
+            users.erase(users.begin() + i);
+        }
+
+    }
+
+}
+
+std::string OnlineUsers() {
+
+    std::string Users;
+
+    for(int i=0; i <users.size();i++) {
+
+        Users = Users + std::to_string(i+1) + ".) ";  
+        Users = Users +  users.at(i)->getUsername();
+        Users = Users + "\n";
+    }
+
+    return Users;
+
+}
 
 
 

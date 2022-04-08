@@ -54,11 +54,10 @@ int main(int argc, char const *argv[])
         printf("%s  ",buffer );
        
 
-  
+
         std::getline(std::cin, message);
-        prompt = const_cast<char*>(message.c_str());
+        prompt = const_cast<char*>(message.c_str()); 
         send(sock , prompt , strlen(prompt) , 0 );
-   
     }
     
     return 0;
