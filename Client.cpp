@@ -55,7 +55,9 @@ int main(int argc, char const *argv[])
        
 
 
-        std::getline(std::cin, message);
+        if(message != "6"){ 
+            std::getline(std::cin, message);
+        }
         prompt = const_cast<char*>(message.c_str()); 
         send(sock , prompt , strlen(prompt) , 0 );
     }

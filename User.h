@@ -14,9 +14,9 @@ class User {
 
         bool findUser(std::string userName, std::string password);
         bool checkUserName(std::string username);
-        
+        bool findLocation(std::string location);
+
         std::string getUsername();
-        std::string getLocations();
         std::string getMessagesRecieved();
         std::string subscribedLocations();
         

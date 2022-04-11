@@ -23,7 +23,7 @@ void UserLogin();
 void UserRegister();
 void LogUserOut(std::string userName);
 std::string OnlineUsers();
-
+std::string MessageToLocation(std::string location);
 // Users logged in
 std::vector <User*> users;
 
@@ -186,7 +186,17 @@ void * Handle_Connection(void * p_new_socket) {
                 location = buffer;
                 user->unsubscribeToLocation(location);
                 
-            } else if(stringBuffer == "5") {
+            } else if(stringBuffer == "3") {
+
+                std::string chosenLocation;
+                std::string chooseLocation = "  Choose location:\n";
+                chooseLocation = chooseLocation + user->subscribedLocations();
+                char* chooseLocationC =  const_cast<char*>(chooseLocation.c_str());
+                write(new_socket, chooseLocationC, strlen(chooseLocationC));
+                valread = read( new_socket, buffer, 30000);
+                
+
+            }else if(stringBuffer == "5") {
 
                 
                 std::string subbedLocations  = user->subscribedLocations();
@@ -200,9 +210,6 @@ void * Handle_Connection(void * p_new_socket) {
                 usersOnline = usersOnline + OnlineUsers();
                 char* usersOnlineC = const_cast<char*>(usersOnline.c_str());
                 write(new_socket, usersOnlineC, strlen(usersOnlineC));
-                valread = read(new_socket, buffer, 30000);
-
-                location = buffer;
 
             }else if(stringBuffer == "8") {
 
@@ -267,6 +274,22 @@ std::string OnlineUsers() {
 
 }
 
+std::string MessageToLocation(std::string location) {
+    
+    std::vector <User*> usersInLocation;
+
+    for(int i=0; i<users.size();i++) {
+
+        if(users.at(i)->findLocation(location) == true) {
+
+            usersInLocation.push_back(users.at(i));
+        }
+        
+
+    }
+
+    std::cout << usersInLocation.size() << std::endl;
+}
 
 
 

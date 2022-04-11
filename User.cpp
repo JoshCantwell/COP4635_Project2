@@ -52,11 +52,13 @@ void User::changePassword(std::string username, std::string password) {
 std::string User::subscribedLocations() {
 
     std::string location;
-    location.append("\n  Locations subscribed to:\n");
+    location = "\n  Locations subscribed to:\n";
 
     for(int i = 0; i < locations.size(); i++) {
-        location.append(locations.at(i));
-        location.append("\n");
+        location = location + std::to_string(i+1);
+        location = location + ".) ";
+        location = location + locations.at(i);
+        location = location + "\n";
     }
 
     return location;
@@ -119,6 +121,18 @@ bool User::checkUserName(std::string username) {
     userFile.close();
 
     return false;
+
+}
+
+bool User::findLocation(std::string location) {
+
+    for(int i=0;i<locations.size();i++){
+
+        if(locations.at(i) == location) {
+
+            return true;
+        }
+    }
 
 }
 
