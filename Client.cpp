@@ -14,7 +14,9 @@
 
 #define PORT 60000
 
-void *recvMessage(void *p_sock);
+void *recvMessage(void *p_sock);    
+char msg[500];
+
 
 int main(int argc, char const *argv[])
 {
@@ -57,7 +59,7 @@ int main(int argc, char const *argv[])
         exit(1);
     }
 
-
+/*
     while(message != "exit") {
    
         message = "";
@@ -75,7 +77,25 @@ int main(int argc, char const *argv[])
         prompt = const_cast<char*>(message.c_str()); 
         send(sock , prompt , strlen(prompt) , 0 );
     }
-    
+  */
+
+    do{
+        memset(msg, 0, sizeof(msg));
+        if(fgets(msg,500, stdin) > 0) {
+
+            int len = write(sock, msg, strlen(msg)-1);
+            if(len < 0) {
+
+                perror("message not sent... ");
+                exit(1);
+
+            }
+        }
+
+    } while(strcmp(msg,"exit\n") != 0);
+
+
+
     return 0;
 }
 
@@ -85,12 +105,12 @@ void *recvMessage(void * p_sock) {
     free(p_sock);
 
        
-    char msg[500] = {};
     int len;
 
     while((len = read(sock, msg, 500 )) > 0) {
 
-        printf("%s  ", msg);
+        puts(msg);
+        memset(msg, 0, 500);
 
     }
 
