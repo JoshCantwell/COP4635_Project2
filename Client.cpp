@@ -10,8 +10,11 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <iostream>
+#include <pthread.h>
 
 #define PORT 60000
+
+void *recvMessage(void *p_sock);
 
 int main(int argc, char const *argv[])
 {
@@ -19,7 +22,8 @@ int main(int argc, char const *argv[])
     struct sockaddr_in serv_addr;
     char* prompt;
     std::string message;
-    
+    pthread_t t;
+
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         printf("\n Socket creation error \n");
@@ -44,14 +48,24 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
+    int *pclient = (int*)malloc(sizeof(int));
+    *pclient = sock;
+
+    if(pthread_create(&t, NULL, recvMessage, pclient) != 0) {
+
+        perror("pthread_create() error");
+        exit(1);
+    }
+
+
     while(message != "exit") {
    
         message = "";
-        prompt = "";
+        prompt;
     
-        char buffer[1024] = {0};
-        valread = read( sock , buffer, 1024);
-        printf("%s  ",buffer );
+        //char buffer[1024] = {0};
+   //     valread = read( sock , buffer, 1024);
+        //printf("%s  ",buffer );
        
 
 
@@ -63,4 +77,21 @@ int main(int argc, char const *argv[])
     }
     
     return 0;
+}
+
+void *recvMessage(void * p_sock) {
+
+    int sock = *((int*)p_sock);
+    free(p_sock);
+
+       
+    char msg[500] = {};
+    int len;
+
+    while((len = read(sock, msg, 500 )) > 0) {
+
+        printf("%s  ", msg);
+
+    }
+
 }

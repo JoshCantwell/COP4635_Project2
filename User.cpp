@@ -49,6 +49,13 @@ void User::changePassword(std::string username, std::string password) {
 
 }
 
+std::string User::streamMessage(std::string message) {
+
+    std::cout << message << "\n" << std::endl;
+
+
+}
+
 std::string User::subscribedLocations() {
 
     std::string location;
@@ -136,6 +143,12 @@ bool User::findLocation(std::string location) {
 
 }
 
+bool User::getInLocation(){
+
+    return inLocation;
+
+}
+
 bool User::findUser(std::string Username, std::string password){
 
     std::ifstream userFile;
@@ -165,6 +178,27 @@ bool User::findUser(std::string Username, std::string password){
     userFile.close();
 
     return false;
+}
+
+bool User::subscribedToLocations() {
+
+
+    if(locations.size() == 0) {
+
+        return false;
+
+    } else {
+
+        return true;
+
+    }
+
+}
+
+void User::setInLocation(bool inLocation) {
+
+    this->inLocation = inLocation;
+
 }
 
 void User::setUserName(std::string username) {

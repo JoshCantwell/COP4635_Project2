@@ -3,7 +3,7 @@ Client:= Client.o
 
 CC = g++
 
-CFLAGS = -std=c++11 -g -Wall
+CFLAGS = -pthread -std=c++11 -g -Wall
 
 all: Server Client User.o
 

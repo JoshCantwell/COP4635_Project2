@@ -25,7 +25,10 @@ void LogUserOut(std::string userName);
 std::string OnlineUsers();
 std::string MessageToLocation(std::string location);
 // Users logged in
-std::vector <User*> users;
+std::vector <User*> users;    
+std::vector <User*> usersInLocation;
+
+
 
 int main(int argc, char const *argv[])
 {
@@ -97,7 +100,6 @@ int main(int argc, char const *argv[])
 void * Handle_Connection(void * p_new_socket) {
 
     User *user = new User();    
-
     int new_socket = *((int*)p_new_socket);
     free(p_new_socket);
     long valread;
@@ -188,13 +190,44 @@ void * Handle_Connection(void * p_new_socket) {
                 
             } else if(stringBuffer == "3") {
 
-                std::string chosenLocation;
-                std::string chooseLocation = "  Choose location:\n";
-                chooseLocation = chooseLocation + user->subscribedLocations();
-                char* chooseLocationC =  const_cast<char*>(chooseLocation.c_str());
-                write(new_socket, chooseLocationC, strlen(chooseLocationC));
-                valread = read( new_socket, buffer, 30000);
+                    
+
+                std::string message;
+                std::string chosenLocation;    
+                std::string chooseLocation = "  Select location you'd like to choose\n";
+
+                if(user->subscribedToLocations() == true) {
                 
+                
+                    chooseLocation = chooseLocation + user->subscribedLocations();
+                    char* chooseLocationC =  const_cast<char*>(chooseLocation.c_str());
+                    write(new_socket, chooseLocationC, strlen(chooseLocationC));
+                    valread = read( new_socket, buffer, 30000);
+                    chosenLocation = buffer;
+                    MessageToLocation(chosenLocation);
+
+                    chooseLocation = "Please type the message you'd like to send: \n";
+                    chooseLocationC = const_cast<char*>(chooseLocation.c_str());
+                    write(new_socket, chooseLocationC, strlen(chooseLocationC));
+                    valread = read( new_socket, buffer, 30000);
+                    message = buffer;
+                    char* messageC = const_cast<char*>(message.c_str());
+                    for(int i=0; i<usersInLocation.size(); i++) {
+
+
+                  
+                        write(usersInLocation.at(i)->getSocketNumber(), messageC, strlen(messageC));
+
+                    }
+
+
+                } else {
+
+                    chosenLocation = "Must be subscribed to atleast one location to do this, Subscribe to a location and try again.";
+                    char* chosenLocationC =  const_cast<char*>(chosenLocation.c_str());
+                    write(new_socket, chosenLocationC, strlen(chosenLocationC));
+
+                }
 
             }else if(stringBuffer == "5") {
 
@@ -276,7 +309,6 @@ std::string OnlineUsers() {
 
 std::string MessageToLocation(std::string location) {
     
-    std::vector <User*> usersInLocation;
 
     for(int i=0; i<users.size();i++) {
 

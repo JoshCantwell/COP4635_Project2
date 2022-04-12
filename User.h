@@ -15,13 +15,17 @@ class User {
         bool findUser(std::string userName, std::string password);
         bool checkUserName(std::string username);
         bool findLocation(std::string location);
+        bool getInLocation();
+        bool subscribedToLocations();
 
         std::string getUsername();
         std::string getMessagesRecieved();
         std::string subscribedLocations();
-        
+        std::string streamMessage(std::string message);
+
         int getSocketNumber();
         
+        void setInLocation(bool inLocation);
         void changePassword(std::string username, std::string password);
         void setUserName(std::string UserName);
         void setLocations(std::string Location);
@@ -33,6 +37,7 @@ class User {
 
     private:
 
+        bool inLocation;
         std::string userName;
         std::vector <std::string> locations;
         std::vector <std::string> messagesRecieved;
