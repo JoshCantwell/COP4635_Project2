@@ -12,7 +12,7 @@
 #include <iostream>
 #include <pthread.h>
 
-#define PORT 60000
+#define PORT 60500
 
 void *recvMessage(void *p_sock);    
 char msg[500];
@@ -59,26 +59,6 @@ int main(int argc, char const *argv[])
         exit(1);
     }
 
-/*
-    while(message != "exit") {
-   
-        message = "";
-        prompt;
-    
-        //char buffer[1024] = {0};
-   //     valread = read( sock , buffer, 1024);
-        //printf("%s  ",buffer );
-       
-
-
-        if(message != "6"){ 
-            std::getline(std::cin, message);
-        }
-        prompt = const_cast<char*>(message.c_str()); 
-        send(sock , prompt , strlen(prompt) , 0 );
-    }
-  */
-
     do{
         memset(msg, 0, sizeof(msg));
         if(fgets(msg,500, stdin) > 0) {
@@ -86,9 +66,11 @@ int main(int argc, char const *argv[])
             int len = write(sock, msg, strlen(msg)-1);
             if(len < 0) {
 
+
                 perror("message not sent... ");
                 exit(1);
 
+                memset(msg, 0, sizeof(msg));
             }
         }
 
@@ -110,8 +92,7 @@ void *recvMessage(void * p_sock) {
     while((len = read(sock, msg, 500 )) > 0) {
 
         puts(msg);
-        memset(msg, 0, 500);
-
+        memset(msg, 0, sizeof(msg));
     }
 
 }

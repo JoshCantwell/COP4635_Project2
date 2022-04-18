@@ -4,6 +4,7 @@
 
 
 #include "User.cpp"
+#include <cstring>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -14,21 +15,21 @@
 #include <iostream>
 #include <vector>
 
-#define PORT 60000
+#define PORT 60500
 
 
 // Functions used throughout the code
+
 void * Handle_Connection(void * new_socket);
 void UserLogin();
 void UserRegister();
 void LogUserOut(std::string userName);
 std::string OnlineUsers();
 std::string MessageToLocation(std::string location);
+User* FindUser(std::string name);
 // Users logged in
 std::vector <User*> users;    
-std::vector <User*> usersInLocation;
-
-
+std::vector <User*> usersInLocation;    
 
 int main(int argc, char const *argv[])
 {
@@ -86,14 +87,18 @@ int main(int argc, char const *argv[])
            exit(1);
        }
 
+    
     }
 
-       if(pthread_join(t, &ret) != 0) {
-           perror("pthread_create() error");
-           exit(3);    
-       }
 
-       return 0;
+    if(pthread_join(t, &ret) != 0) {
+        perror("pthread_create() error");
+        exit(3);    
+    
+    }
+
+
+          return 0;
 }
 
 
@@ -117,6 +122,7 @@ void * Handle_Connection(void * p_new_socket) {
     while(stringBuffer != "exit") {
 
     
+        
         char buffer[30000] = {0}; 
 
         if(loggedIn == false) {
@@ -176,29 +182,36 @@ void * Handle_Connection(void * p_new_socket) {
 
             if(stringBuffer == "1") {
 
+                memset(buffer, 0, sizeof(buffer));
                 write(new_socket, "  Select a location to subscribe to:\n", 37);
                 valread = read(new_socket, buffer, 30000);
                 location = buffer;
                 user->subscribeToLocation(location);
 
+                    
+                memset(buffer, 0, 30000);
             } else if(stringBuffer == "2") {
 
+                memset(buffer, 0, sizeof(buffer));
                 write(new_socket, "  Select a location to unsubscribe from:\n", 43);
                 valread = read(new_socket, buffer, 30000);
                 location = buffer;
                 user->unsubscribeToLocation(location);
                 
-            } else if(stringBuffer == "3") {
+            }else if(stringBuffer == "3") {
 
                     
 
+                memset(buffer, 0, sizeof(buffer));
                 std::string message;
                 std::string chosenLocation;    
                 std::string chooseLocation = "  Select location you'd like to choose\n";
 
                 if(user->subscribedToLocations() == true) {
                 
+
                 
+                    //std::vector <User*> usersInLocation;
                     chooseLocation = chooseLocation + user->subscribedLocations();
                     char* chooseLocationC =  const_cast<char*>(chooseLocation.c_str());
                     write(new_socket, chooseLocationC, strlen(chooseLocationC));
@@ -206,6 +219,8 @@ void * Handle_Connection(void * p_new_socket) {
                     chosenLocation = buffer;
                     MessageToLocation(chosenLocation);
 
+                
+                    memset(buffer, 0, sizeof(buffer));
                     chooseLocation = "Please type the message you'd like to send: \n";
                     chooseLocationC = const_cast<char*>(chooseLocation.c_str());
                     write(new_socket, chooseLocationC, strlen(chooseLocationC));
@@ -221,6 +236,7 @@ void * Handle_Connection(void * p_new_socket) {
                     }
 
 
+
                 } else {
 
                     chosenLocation = "Must be subscribed to atleast one location to do this, Subscribe to a location and try again.";
@@ -229,15 +245,30 @@ void * Handle_Connection(void * p_new_socket) {
 
                 }
 
+            }  else if (stringBuffer == "4") {
+           
+
+                memset(buffer, 0, sizeof(buffer));
+                std::string message;
+                std::string onlineUsers = "  Select a user to send a message to:\n";
+                onlineUsers = onlineUsers + OnlineUsers();
+                char* onlineUsersC = const_cast<char*>(onlineUsers.c_str());
+                write(new_socket, onlineUsersC, strlen(onlineUsersC));
+                valread = read(new_socket, buffer, 30000);
+                message = buffer;
+                
+                
             }else if(stringBuffer == "5") {
 
                 
+                memset(buffer, 0, sizeof(buffer));
                 std::string subbedLocations  = user->subscribedLocations();
                 char* subbedLocationsChar = const_cast<char*>(subbedLocations.c_str());
                 write(new_socket, subbedLocationsChar, strlen(subbedLocationsChar));
 
             } else if(stringBuffer == "6") {
        
+                memset(buffer, 0, sizeof(buffer));
                 std::string usersOnline;
                 usersOnline = usersOnline + "  All online users:\n";
                 usersOnline = usersOnline + OnlineUsers();
@@ -246,6 +277,7 @@ void * Handle_Connection(void * p_new_socket) {
 
             }else if(stringBuffer == "8") {
 
+                memset(buffer, 0, sizeof(buffer));
                 username = user->getUsername();
                 write(new_socket, "\n  Select new password:\n", 23);
                 valread = read(new_socket, buffer, 30000);
@@ -308,21 +340,38 @@ std::string OnlineUsers() {
 }
 
 std::string MessageToLocation(std::string location) {
-    
 
+    usersInLocation.clear();
     for(int i=0; i<users.size();i++) {
 
         if(users.at(i)->findLocation(location) == true) {
 
-            usersInLocation.push_back(users.at(i));
+                usersInLocation.push_back(users.at(i));
         }
         
 
     }
 
-    std::cout << usersInLocation.size() << std::endl;
 }
 
+
+User* FindUser(std::string name) {
+
+
+    int socketNumber;
+    for(int i=0; i < users.size(); i++) {
+
+        if(users.at(i)->getUsername() == name) {
+
+            return users.at(i);
+
+        }
+
+    }
+
+    return NULL;
+
+}
 
 
 
