@@ -24,12 +24,14 @@ void * Handle_Connection(void * new_socket);
 void UserLogin();
 void UserRegister();
 void LogUserOut(std::string userName);
-std::string OnlineUsers();
-std::string MessageToLocation(std::string location);
+void lastMessagesSent(std::string message);
+std::string OnlineUsers(std::string userName);
+std::string MessageToLocation(std::string location, std::string userName);
 User* FindUser(std::string name);
 // Users logged in
 std::vector <User*> users;    
 std::vector <User*> usersInLocation;    
+std::vector <std::string> LastTenMessages;
 
 int main(int argc, char const *argv[])
 {
@@ -205,7 +207,7 @@ void * Handle_Connection(void * p_new_socket) {
                 memset(buffer, 0, sizeof(buffer));
                 std::string message;
                 std::string chosenLocation;    
-                std::string chooseLocation = "  Select location you'd like to choose\n";
+                std::string chooseLocation = "  Select location you'd like to choose(Type the location name not the number):\n";
 
                 if(user->subscribedToLocations() == true) {
                 
@@ -217,7 +219,7 @@ void * Handle_Connection(void * p_new_socket) {
                     write(new_socket, chooseLocationC, strlen(chooseLocationC));
                     valread = read( new_socket, buffer, 30000);
                     chosenLocation = buffer;
-                    MessageToLocation(chosenLocation);
+                    MessageToLocation(chosenLocation, user->getUsername());
 
                 
                     memset(buffer, 0, sizeof(buffer));
@@ -251,12 +253,43 @@ void * Handle_Connection(void * p_new_socket) {
                 memset(buffer, 0, sizeof(buffer));
                 std::string message;
                 std::string onlineUsers = "  Select a user to send a message to:\n";
-                onlineUsers = onlineUsers + OnlineUsers();
+                onlineUsers = onlineUsers + OnlineUsers(user->getUsername());
                 char* onlineUsersC = const_cast<char*>(onlineUsers.c_str());
                 write(new_socket, onlineUsersC, strlen(onlineUsersC));
                 valread = read(new_socket, buffer, 30000);
                 message = buffer;
+                if(FindUser(message) != NULL){
+                    User* pickedUser = FindUser(message);
+                    memset(buffer, 0, sizeof(buffer));
+                    onlineUsers = "  Please type a message you'd like to send:\n";
+
+                    onlineUsersC = const_cast<char*>(onlineUsers.c_str());
+                    write(new_socket, onlineUsersC, strlen(onlineUsersC));
+                    valread = read(new_socket, buffer, 30000);
+                    message = "  Message from ";
+                    message = message + user->getUsername();
+                    message = message + ": ";
+                    message = message + buffer;
+                    message = message + "\n";
+
                 
+                    char* messageC = const_cast<char*>(message.c_str());
+                    write(pickedUser->getSocketNumber(), messageC, strlen(messageC));
+
+               
+                    
+
+
+                } else {
+
+                
+                    memset(buffer, 0, sizeof(buffer));
+                    onlineUsers = "  User picked was not in the list...\n";
+                    onlineUsersC = const_cast<char*>(onlineUsers.c_str());
+                    write(new_socket, onlineUsersC, strlen(onlineUsersC));
+                    
+                }
+
                 
             }else if(stringBuffer == "5") {
 
@@ -271,7 +304,7 @@ void * Handle_Connection(void * p_new_socket) {
                 memset(buffer, 0, sizeof(buffer));
                 std::string usersOnline;
                 usersOnline = usersOnline + "  All online users:\n";
-                usersOnline = usersOnline + OnlineUsers();
+                usersOnline = usersOnline + OnlineUsers(user->getUsername());
                 char* usersOnlineC = const_cast<char*>(usersOnline.c_str());
                 write(new_socket, usersOnlineC, strlen(usersOnlineC));
 
@@ -290,7 +323,7 @@ void * Handle_Connection(void * p_new_socket) {
             } // Testing
             else if (stringBuffer == "d") {
 
-                std::cout << OnlineUsers() << std::endl; 
+                std::cout << OnlineUsers(user->getUsername()) << std::endl; 
             }
 
 
@@ -324,29 +357,33 @@ void LogUserOut(std::string userName){
 
 }
 
-std::string OnlineUsers() {
+std::string OnlineUsers(std::string userName) {
 
     std::string Users;
 
     for(int i=0; i <users.size();i++) {
 
+        if(users.at(i)->getUsername() != userName){
         Users = Users + std::to_string(i+1) + ".) ";  
         Users = Users +  users.at(i)->getUsername();
         Users = Users + "\n";
+        }
     }
 
     return Users;
 
 }
 
-std::string MessageToLocation(std::string location) {
+std::string MessageToLocation(std::string location, std::string userName){
 
     usersInLocation.clear();
     for(int i=0; i<users.size();i++) {
 
         if(users.at(i)->findLocation(location) == true) {
 
+            if(users.at(i)->getUsername() != userName){
                 usersInLocation.push_back(users.at(i));
+            }
         }
         
 
@@ -372,6 +409,49 @@ User* FindUser(std::string name) {
     return NULL;
 
 }
+
+void lastMessagesSent(std::string message){
+
+
+    std::vector <std::string> newLast;
+
+    if(LastTenMessages.size() <= 10){
+
+        LastTenMessages.push_back(message);
+
+    } else {
+
+        for(int i=1;i<10;i++){
+
+            LastTenMessages.at(i-1) = LastTenMessages.at(i);
+
+
+        }
+        LastTenMessages.at(9) = message;
+
+    }
+
+}
+
+std::string showLastTen() {
+
+    std::string lastTen = "  Last ten messages:\n";
+    lastTen = lastTen + LastTenMessages.at(0);
+    for(int i=1; i < 10; i++){
+
+        lastTen = lastTen + "\n";
+        lastTen = lastTen + LastTenMessages.at(i); 
+    }
+
+
+    return lastTen;
+
+}
+
+
+
+
+
 
 
 
