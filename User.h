@@ -22,9 +22,11 @@ class User {
         std::string getMessagesRecieved();
         std::string subscribedLocations();
         std::string streamMessage(std::string message);
+        std::string getLastMessages();
 
         int getSocketNumber();
         
+        void setLastMessages(std::string message);
         void setInLocation(bool inLocation);
         void changePassword(std::string username, std::string password);
         void setUserName(std::string UserName);
@@ -41,6 +43,7 @@ class User {
         std::string userName;
         std::vector <std::string> locations;
         std::vector <std::string> messagesRecieved;
+        std::vector <std::string> LastTenMessages;
         int socketNumber;
 
 };

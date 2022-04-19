@@ -6,6 +6,26 @@
 
 #include "User.h"
 
+void User::setLastMessages(std::string message) {
+
+    if(LastTenMessages.size() < 10) {
+
+        LastTenMessages.push_back(message);
+
+    } else {
+
+        LastTenMessages.push_back(message);
+        for(int i=1;i<LastTenMessages.size();i++){
+
+            LastTenMessages.at(i-1) = LastTenMessages.at(i);
+        }
+       
+
+    }
+
+
+}
+
 void User::changePassword(std::string username, std::string password) {
 
                 
@@ -46,6 +66,20 @@ void User::changePassword(std::string username, std::string password) {
     userFileIn.close();
 
 
+
+}
+
+std::string User::getLastMessages(){
+
+    std::string lastTen = "  Last ten messages:\n";
+    for(int i=0; i<LastTenMessages.size(); i++) {
+
+        lastTen = lastTen + "\n";
+        lastTen = lastTen + LastTenMessages.at(i);
+
+    }
+
+    return lastTen;
 
 }
 

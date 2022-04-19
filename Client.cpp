@@ -10,12 +10,16 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <iostream>
+#include <vector>
 #include <pthread.h>
 
 #define PORT 60500
 
+void lastMessagesSent(std::string message);
 void *recvMessage(void *p_sock);    
 char msg[500];
+std::vector <std::string> LastTenMessages;
+std::string showLastTen();
 
 
 int main(int argc, char const *argv[])
@@ -60,10 +64,12 @@ int main(int argc, char const *argv[])
     }
 
     do{
+        
         memset(msg, 0, sizeof(msg));
         if(fgets(msg,500, stdin) > 0) {
 
             int len = write(sock, msg, strlen(msg)-1);
+            
             if(len < 0) {
 
 
@@ -71,7 +77,9 @@ int main(int argc, char const *argv[])
                 exit(1);
 
                 memset(msg, 0, sizeof(msg));
+                
             }
+            
         }
 
     } while(strcmp(msg,"exit\n") != 0);
@@ -91,8 +99,69 @@ void *recvMessage(void * p_sock) {
 
     while((len = read(sock, msg, 500 )) > 0) {
 
+        
         puts(msg);
         memset(msg, 0, sizeof(msg));
     }
 
 }
+
+
+void lastMessagesSent(std::string message){
+
+    std::vector <std::string> newLast;
+
+    if(LastTenMessages.size() <= 10){
+
+        LastTenMessages.push_back(message);
+            
+    } else {
+        for(int i=1;i<10;i++){
+
+            LastTenMessages.at(i-1) = LastTenMessages.at(i);
+        }
+        LastTenMessages.at(9) = message;
+
+    }
+
+    std::cout << LastTenMessages.size() << std::endl;
+
+}
+
+std::string showLastTen(){
+
+    std::string lastTen =  LastTenMessages.at(0);
+    for(int i=1; i<10; i++) {
+
+        lastTen = lastTen + "\n";
+        lastTen = lastTen + LastTenMessages.at(i);
+
+    }
+    return lastTen;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -214,6 +214,7 @@ void * Handle_Connection(void * p_new_socket) {
 
                 
                     //std::vector <User*> usersInLocation;
+                    std::string lastMessages;
                     chooseLocation = chooseLocation + user->subscribedLocations();
                     char* chooseLocationC =  const_cast<char*>(chooseLocation.c_str());
                     write(new_socket, chooseLocationC, strlen(chooseLocationC));
@@ -221,18 +222,21 @@ void * Handle_Connection(void * p_new_socket) {
                     chosenLocation = buffer;
                     MessageToLocation(chosenLocation, user->getUsername());
 
+                    message = "  Message to " + chosenLocation + " from " + user->getUsername() + ": ";
                 
                     memset(buffer, 0, sizeof(buffer));
                     chooseLocation = "Please type the message you'd like to send: \n";
                     chooseLocationC = const_cast<char*>(chooseLocation.c_str());
                     write(new_socket, chooseLocationC, strlen(chooseLocationC));
                     valread = read( new_socket, buffer, 30000);
-                    message = buffer;
+                    message = message + buffer;
+                    lastMessages = buffer;
                     char* messageC = const_cast<char*>(message.c_str());
                     for(int i=0; i<usersInLocation.size(); i++) {
 
 
                   
+                        usersInLocation.at(i)->setLastMessages(lastMessages);
                         write(usersInLocation.at(i)->getSocketNumber(), messageC, strlen(messageC));
 
                     }
@@ -251,6 +255,7 @@ void * Handle_Connection(void * p_new_socket) {
            
 
                 memset(buffer, 0, sizeof(buffer));
+                std::string lastMessages;
                 std::string message;
                 std::string onlineUsers = "  Select a user to send a message to:\n";
                 onlineUsers = onlineUsers + OnlineUsers(user->getUsername());
@@ -272,6 +277,8 @@ void * Handle_Connection(void * p_new_socket) {
                     message = message + buffer;
                     message = message + "\n";
 
+                    lastMessages = buffer;
+                    pickedUser->setLastMessages(lastMessages);
                 
                     char* messageC = const_cast<char*>(message.c_str());
                     write(pickedUser->getSocketNumber(), messageC, strlen(messageC));
@@ -308,6 +315,14 @@ void * Handle_Connection(void * p_new_socket) {
                 char* usersOnlineC = const_cast<char*>(usersOnline.c_str());
                 write(new_socket, usersOnlineC, strlen(usersOnlineC));
 
+            } else if(stringBuffer == "7"){
+           
+                std::string lastMessages = user->getLastMessages();
+                memset(buffer, 0, sizeof(buffer));
+                std::string lastmsgs = "  Your last 10 messages were:\n";
+                char* lastmsgsC = const_cast<char*>(lastMessages.c_str());
+                write(new_socket, lastmsgsC, strlen(lastmsgsC));
+            
             }else if(stringBuffer == "8") {
 
                 memset(buffer, 0, sizeof(buffer));
@@ -437,7 +452,7 @@ std::string showLastTen() {
 
     std::string lastTen = "  Last ten messages:\n";
     lastTen = lastTen + LastTenMessages.at(0);
-    for(int i=1; i < 10; i++){
+    for(int i=1; i < 9; i++){
 
         lastTen = lastTen + "\n";
         lastTen = lastTen + LastTenMessages.at(i); 
